@@ -21,11 +21,11 @@ EMOJI_PINEAPPLE = "\ud83c\udf4d"
 EMOJI_SADFACE = "\ud83d\ude22"
 
 MESSAGE_ALREADY_OPEN = "Já tem um abacaxi aberto:\n{0}"
-MESSAGE_CLOSE_PINEAPPLE = EMOJI_HAND + " Pessoas que querem <b>{0}</b>:"
+MESSAGE_CLOSE_PINEAPPLE = EMOJI_HAND + " Quem quer <b>{0}</b>:"
 MESSAGE_FINGER = EMOJI_FINGER
 MESSAGE_NOT_YET_OPEN = "Nenhum abacaxi aberto."
 MESSAGE_NO_ONE = "Ninguém quer <b>{0}</b>. " + EMOJI_SADFACE
-MESSAGE_NEW_PINEAPPLE = "Quem quer <b>{0}</b> põe o dedo aqui,\nque já vai fechar\no abacaxi. " + EMOJI_PINEAPPLE
+MESSAGE_NEW_PINEAPPLE = "Quem quer <b>{0}</b>\npõe o dedo aqui,\nque já vai fechar\no abacaxi. " + EMOJI_PINEAPPLE
 MESSAGE_USAGE_OPEN = "Uso:\n/abacaxi <ação>"
 
 
