@@ -96,7 +96,7 @@ def main():
 
     dp.add_handler(CommandHandler('abacaxi', open_pineapple_command, pass_args=True))
     dp.add_handler(CommandHandler('dedo', finger_command))
-    dp.add_handler(CommandHandler('fecha', close_pineapple_command))
+    dp.add_handler(CommandHandler('fechar', close_pineapple_command))
 
     updater.start_polling()
     updater.idle()
