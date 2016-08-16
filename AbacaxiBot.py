@@ -5,6 +5,7 @@
 
 from telegram import Bot
 from telegram.ext import CommandHandler, Updater
+import logging
 
 # Create the bot
 import tokens
@@ -26,6 +27,13 @@ MESSAGE_NOT_YET_OPEN = "Nenhum abacaxi aberto."
 MESSAGE_NO_ONE = "Ninguém quer <b>{0}</b>. " + EMOJI_SADFACE
 MESSAGE_NEW_PINEAPPLE = "Quem quer <b>{0}</b> põe o dedo aqui,\nque já vai fechar\no abacaxi. " + EMOJI_PINEAPPLE
 MESSAGE_USAGE_OPEN = "Uso:\n/abacaxi <ação>"
+
+
+# Logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 # Messaging
