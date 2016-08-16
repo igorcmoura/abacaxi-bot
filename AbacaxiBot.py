@@ -58,6 +58,7 @@ def fingers_and_name(name, fingers):
 
 # Pineapple manipulation
 def open_pineapple(chat_id, action):
+    logger.info("Pineapple action: %s" % action)
     open_pineapples[chat_id] = {'action': action, 'adopters': {}}
     send_message(chat_id, MESSAGE_NEW_PINEAPPLE.format(action))
 
@@ -88,10 +89,13 @@ def close_pineapple(chat_id):
 # Commands
 def open_pineapple_command(bot, update, args):
     chat_id = update.message.chat_id
+    logger.info("Opening pineapple on %s" % chat_id)
     if len(args) == 0:
+        logger.info("Not enough arguments")
         send_message(chat_id, MESSAGE_USAGE_OPEN, None)
         return
     if chat_id in open_pineapples.keys():
+        logger.info("Pineapple already open")
         send_message(chat_id, MESSAGE_ALREADY_OPEN.format(
             MESSAGE_NEW_PINEAPPLE.format(open_pineapples[chat_id]['action'])))
         return
@@ -100,7 +104,9 @@ def open_pineapple_command(bot, update, args):
 
 def finger_command(bot, update):
     chat_id = update.message.chat_id
+    logger.info("Finger on %s" % chat_id)
     if chat_id not in open_pineapples.keys():
+        logger.info("Pineapple closed")
         send_message(chat_id, MESSAGE_NOT_YET_OPEN)
         return
     finger(chat_id, update.message.from_user)
@@ -108,7 +114,9 @@ def finger_command(bot, update):
 
 def close_pineapple_command(bot, update):
     chat_id = update.message.chat_id
+    logger.info("Close pineapple on %s" % chat_id)
     if chat_id not in open_pineapples.keys():
+        logger.info("Pineapple already closed")
         send_message(chat_id, MESSAGE_NOT_YET_OPEN)
         return
     close_pineapple(chat_id)
