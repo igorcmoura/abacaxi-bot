@@ -15,15 +15,19 @@ bot = Bot(TOKEN)
 open_pineapples = {}
 
 # Constants
-EMOJI_HAND = "\ud83d\udc4a"
+EMOJI_BOTH_HANDS = "\ud83d\ude4c"
+EMOJI_CLOSED_HAND = "\ud83d\udc4a"
+EMOJI_HAND = "\ud83d\udd90"
 EMOJI_FINGER = "\u261d\ufe0f"
+EMOJI_TWO_FINGER = "\u270c"
 EMOJI_PINEAPPLE = "\ud83c\udf4d"
 EMOJI_SADFACE = "\ud83d\ude22"
 
 MESSAGE_ALREADY_OPEN = "Já tem um abacaxi aberto:\n{0}"
-MESSAGE_CLOSE_PINEAPPLE = EMOJI_HAND + " Quem quer <b>{0}</b>:"
+MESSAGE_CLOSE_PINEAPPLE = EMOJI_CLOSED_HAND + " Quem quer <b>{0}</b>:"
 MESSAGE_FINGER = EMOJI_FINGER
 MESSAGE_NOT_YET_OPEN = "Nenhum abacaxi aberto."
+MESSAGE_NO_MORE_FINGERS_IN_HAND = "Você não tem mais dedos em suas mãos."
 MESSAGE_NO_ONE = "Ninguém quer <b>{0}</b>. " + EMOJI_SADFACE
 MESSAGE_NEW_PINEAPPLE = "Quem quer <b>{0}</b>\npõe o dedo aqui,\nque já vai fechar\no abacaxi. " + EMOJI_PINEAPPLE
 MESSAGE_USAGE_OPEN = "Uso:\n/abacaxi <ação>"
@@ -41,19 +45,31 @@ def send_message(chat_id, text, parse_mode='HTML'):
     bot.send_message(chat_id, text, parse_mode=parse_mode)
 
 
+def fingers_and_name(name, fingers):
+    if fingers >= 10:
+        return EMOJI_BOTH_HANDS + " " + name
+    elif fingers >= 5:
+        return EMOJI_HAND + " " + name
+    elif fingers >= 2:
+        return EMOJI_TWO_FINGER + " " + name
+    else:
+        return EMOJI_FINGER + " " + name
+
+
 # Pineapple manipulation
 def open_pineapple(chat_id, action):
-    open_pineapples[chat_id] = {'action': action, 'adopters': []}
+    open_pineapples[chat_id] = {'action': action, 'adopters': {}}
     send_message(chat_id, MESSAGE_NEW_PINEAPPLE.format(action))
 
 
 def finger(chat_id, user):
-    nick = user.username
-    if nick is None or nick == "":
-        nick = user.first_name
+    name = user.first_name + " " + user.last_name
 
-    if nick not in open_pineapples[chat_id]['adopters']:
-        open_pineapples[chat_id]['adopters'].append(nick)
+    if open_pineapples[chat_id]['adopters'].setdefault(name, 0) >= 10:
+        send_message(chat_id, MESSAGE_NO_MORE_FINGERS_IN_HAND)
+        return
+
+    open_pineapples[chat_id]['adopters'][name] += 1
     send_message(chat_id, MESSAGE_FINGER)
 
 
@@ -64,8 +80,8 @@ def close_pineapple(chat_id):
         return
 
     message = MESSAGE_CLOSE_PINEAPPLE.format(pineapple['action'])
-    for adopter in pineapple['adopters']:
-        message += "\n" + EMOJI_FINGER + " " + adopter
+    for adopter, fingers in pineapple['adopters'].items():
+        message += "\n" + fingers_and_name(adopter, fingers)
     send_message(chat_id, message)
 
 
