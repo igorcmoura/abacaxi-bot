@@ -6,6 +6,7 @@
 from telegram import Bot
 from telegram.ext import CommandHandler, Updater
 import logging
+import random
 
 # Create the bot
 import tokens
@@ -23,8 +24,14 @@ EMOJI_TWO_FINGER = "\u270c"
 EMOJI_PINEAPPLE = "\ud83c\udf4d"
 EMOJI_SADFACE = "\ud83d\ude22"
 
+EMOJI_EXPRESSIONLESS = "\ud83d\ude11"
+EMOJI_UNAMUSED = "\ud83d\ude12"
+EMOJI_THINKING = "\ud83e\udd14"
+IGNORE_EMOJIS = [EMOJI_UNAMUSED, EMOJI_EXPRESSIONLESS, EMOJI_THINKING]
+
 MESSAGE_ALREADY_OPEN = "Já tem um abacaxi aberto:\n{0}"
-MESSAGE_CLOSE_PINEAPPLE = EMOJI_CLOSED_HAND + " Quem quer <b>{0}</b>:"
+MESSAGE_WHO_IGNORED = "Quem ignorou:"
+MESSAGE_WHO_WANTS = EMOJI_CLOSED_HAND + " Quem quer <b>{0}</b>:"
 MESSAGE_FINGER = EMOJI_FINGER
 MESSAGE_NOT_YET_OPEN = "Nenhum abacaxi aberto."
 MESSAGE_NO_MORE_FINGERS_IN_HAND = "Você não tem mais dedos em suas mãos."
@@ -52,6 +59,8 @@ def fingers_and_name(name, fingers):
         return EMOJI_HAND + " " + name
     elif fingers >= 2:
         return EMOJI_TWO_FINGER + " " + name
+    elif fingers <= 0:
+        return IGNORE_EMOJIS[-fingers] + " " + name
     else:
         return EMOJI_FINGER + " " + name
 
@@ -59,8 +68,21 @@ def fingers_and_name(name, fingers):
 def get_fingers_list(adopters_dict):
     message = ""
     for adopter, fingers in adopters_dict.items():
-        message += "\n" + fingers_and_name(adopter, fingers)
+        if fingers > 0:
+            message += "\n" + fingers_and_name(adopter, fingers)
     return message
+
+
+def get_ignores_list(adopters_dict):
+    message = ""
+    for adopter, fingers in adopters_dict.items():
+        if fingers <= 0:
+            message += "\n" + fingers_and_name(adopter, fingers)
+    return message
+
+
+def get_full_list(adopters_dict):
+    return get_fingers_list(adopters_dict) + get_ignores_list(adopters_dict)
 
 
 # Pineapple manipulation
@@ -78,7 +100,14 @@ def finger(chat_id, user):
         return
 
     open_pineapples[chat_id]['adopters'][name] += 1
-    send_message(chat_id, get_fingers_list(open_pineapples[chat_id]['adopters']))
+    send_message(chat_id, get_full_list(open_pineapples[chat_id]['adopters']))
+
+
+def ignore(chat_id, user):
+    name = user.first_name + " " + user.last_name
+    value = random.randint(-(len(IGNORE_EMOJIS)-1), 0)
+    open_pineapples[chat_id]['adopters'][name] = value
+    send_message(chat_id, get_full_list(open_pineapples[chat_id]['adopters']))
 
 
 def close_pineapple(chat_id):
@@ -87,8 +116,18 @@ def close_pineapple(chat_id):
         send_message(chat_id, MESSAGE_NO_ONE.format(pineapple['action']))
         return
 
-    message = MESSAGE_CLOSE_PINEAPPLE.format(pineapple['action'])
-    message += get_fingers_list(pineapple['adopters'])
+    fingers_list = get_fingers_list(pineapple['adopters'])
+    ignores_list = get_ignores_list(pineapple['adopters'])
+
+    message = ""
+    if fingers_list != "":
+        message += MESSAGE_WHO_WANTS.format(pineapple['action'])
+        message += fingers_list
+
+    if ignores_list != "":
+        message += "\n" + MESSAGE_WHO_IGNORED
+        message += ignores_list
+
     send_message(chat_id, message)
 
 
@@ -128,6 +167,16 @@ def who_finger_command(bot, update):
     send_message(chat_id, get_fingers_list(open_pineapples[chat_id]['adopters']))
 
 
+def ignore_command(bot, update):
+    chat_id = update.message.chat_id
+    logger.info("Getting fingers on %s" % chat_id)
+    if chat_id not in open_pineapples.keys():
+        logger.info("Pineapple not open")
+        send_message(chat_id, MESSAGE_NOT_YET_OPEN)
+        return
+    ignore(chat_id, update.message.from_user)
+
+
 def close_pineapple_command(bot, update):
     chat_id = update.message.chat_id
     logger.info("Close pineapple on %s" % chat_id)
@@ -139,12 +188,15 @@ def close_pineapple_command(bot, update):
 
 
 def main():
+    random.seed()
+
     updater = Updater(bot=bot)
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler('abacaxi', open_pineapple_command, pass_args=True))
     dp.add_handler(CommandHandler('dedo', finger_command))
     dp.add_handler(CommandHandler('dedodequem', who_finger_command))
+    dp.add_handler(CommandHandler('ignorar', ignore_command))
     dp.add_handler(CommandHandler('fechar', close_pineapple_command))
 
     updater.start_polling()
