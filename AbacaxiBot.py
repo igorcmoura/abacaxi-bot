@@ -56,6 +56,13 @@ def fingers_and_name(name, fingers):
         return EMOJI_FINGER + " " + name
 
 
+def get_fingers_list(adopters_dict):
+    message = ""
+    for adopter, fingers in adopters_dict.items():
+        message += "\n" + fingers_and_name(adopter, fingers)
+    return message
+
+
 # Pineapple manipulation
 def open_pineapple(chat_id, action):
     logger.info("Pineapple action: %s" % action)
@@ -71,7 +78,7 @@ def finger(chat_id, user):
         return
 
     open_pineapples[chat_id]['adopters'][name] += 1
-    send_message(chat_id, MESSAGE_FINGER)
+    send_message(chat_id, get_fingers_list(open_pineapples[chat_id]['adopters']))
 
 
 def close_pineapple(chat_id):
@@ -81,8 +88,7 @@ def close_pineapple(chat_id):
         return
 
     message = MESSAGE_CLOSE_PINEAPPLE.format(pineapple['action'])
-    for adopter, fingers in pineapple['adopters'].items():
-        message += "\n" + fingers_and_name(adopter, fingers)
+    message += get_fingers_list(pineapple['adopters'])
     send_message(chat_id, message)
 
 
@@ -106,10 +112,20 @@ def finger_command(bot, update):
     chat_id = update.message.chat_id
     logger.info("Finger on %s" % chat_id)
     if chat_id not in open_pineapples.keys():
-        logger.info("Pineapple closed")
+        logger.info("Pineapple not open")
         send_message(chat_id, MESSAGE_NOT_YET_OPEN)
         return
     finger(chat_id, update.message.from_user)
+
+
+def who_finger_command(bot, update):
+    chat_id = update.message.chat_id
+    logger.info("Getting fingers on %s" % chat_id)
+    if chat_id not in open_pineapples.keys():
+        logger.info("Pineapple not open")
+        send_message(chat_id, MESSAGE_NOT_YET_OPEN)
+        return
+    send_message(chat_id, get_fingers_list(open_pineapples[chat_id]['adopters']))
 
 
 def close_pineapple_command(bot, update):
@@ -128,6 +144,7 @@ def main():
 
     dp.add_handler(CommandHandler('abacaxi', open_pineapple_command, pass_args=True))
     dp.add_handler(CommandHandler('dedo', finger_command))
+    dp.add_handler(CommandHandler('dedodequem', who_finger_command))
     dp.add_handler(CommandHandler('fechar', close_pineapple_command))
 
     updater.start_polling()
