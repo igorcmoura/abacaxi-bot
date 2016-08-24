@@ -8,10 +8,9 @@ from telegram.ext import CommandHandler, Updater
 import logging
 import random
 
-# Create the bot
+# Get the token from tokens file
 import tokens
 TOKEN = tokens.ABACAXI_TOKEN
-bot = Bot(TOKEN)
 
 open_pineapples = {}
 
@@ -48,7 +47,7 @@ logger = logging.getLogger(__name__)
 
 
 # Messaging
-def send_message(chat_id, text, parse_mode='HTML'):
+def send_message(bot, chat_id, text, parse_mode='HTML'):
     bot.send_message(chat_id, text, parse_mode=parse_mode)
 
 
@@ -89,32 +88,30 @@ def get_full_list(adopters_dict):
 def open_pineapple(chat_id, action):
     logger.info("Pineapple action: %s" % action)
     open_pineapples[chat_id] = {'action': action, 'adopters': {}}
-    send_message(chat_id, MESSAGE_NEW_PINEAPPLE.format(action))
+    return MESSAGE_NEW_PINEAPPLE.format(action)
 
 
 def finger(chat_id, user):
     name = user.first_name + " " + user.last_name
 
     if open_pineapples[chat_id]['adopters'].setdefault(name, 0) >= 10:
-        send_message(chat_id, MESSAGE_NO_MORE_FINGERS_IN_HAND)
-        return
+        return MESSAGE_NO_MORE_FINGERS_IN_HAND
 
     open_pineapples[chat_id]['adopters'][name] += 1
-    send_message(chat_id, get_full_list(open_pineapples[chat_id]['adopters']))
+    return get_full_list(open_pineapples[chat_id]['adopters'])
 
 
 def ignore(chat_id, user):
     name = user.first_name + " " + user.last_name
     value = random.randint(-(len(IGNORE_EMOJIS)-1), 0)
     open_pineapples[chat_id]['adopters'][name] = value
-    send_message(chat_id, get_full_list(open_pineapples[chat_id]['adopters']))
+    return get_full_list(open_pineapples[chat_id]['adopters'])
 
 
 def close_pineapple(chat_id):
     pineapple = open_pineapples.pop(chat_id)
     if len(pineapple['adopters']) == 0:
-        send_message(chat_id, MESSAGE_NO_ONE.format(pineapple['action']))
-        return
+        return MESSAGE_NO_ONE.format(pineapple['action'])
 
     fingers_list = get_fingers_list(pineapple['adopters'])
     ignores_list = get_ignores_list(pineapple['adopters'])
@@ -128,7 +125,7 @@ def close_pineapple(chat_id):
         message += "\n" + MESSAGE_WHO_IGNORED
         message += ignores_list
 
-    send_message(chat_id, message)
+    return message
 
 
 # Commands
@@ -137,14 +134,15 @@ def open_pineapple_command(bot, update, args):
     logger.info("Opening pineapple on %s" % chat_id)
     if len(args) == 0:
         logger.info("Not enough arguments")
-        send_message(chat_id, MESSAGE_USAGE_OPEN, None)
+        send_message(bot, chat_id, MESSAGE_USAGE_OPEN, None)
         return
     if chat_id in open_pineapples.keys():
         logger.info("Pineapple already open")
-        send_message(chat_id, MESSAGE_ALREADY_OPEN.format(
+        send_message(bot, chat_id, MESSAGE_ALREADY_OPEN.format(
             MESSAGE_NEW_PINEAPPLE.format(open_pineapples[chat_id]['action'])))
         return
-    open_pineapple(chat_id, ' '.join(args))
+    message = open_pineapple(chat_id, ' '.join(args))
+    send_message(bot, chat_id, message)
 
 
 def finger_command(bot, update):
@@ -152,9 +150,10 @@ def finger_command(bot, update):
     logger.info("Finger on %s" % chat_id)
     if chat_id not in open_pineapples.keys():
         logger.info("Pineapple not open")
-        send_message(chat_id, MESSAGE_NOT_YET_OPEN)
+        send_message(bot, chat_id, MESSAGE_NOT_YET_OPEN)
         return
-    finger(chat_id, update.message.from_user)
+    message = finger(chat_id, update.message.from_user)
+    send_message(bot, chat_id, message)
 
 
 def who_finger_command(bot, update):
@@ -162,9 +161,10 @@ def who_finger_command(bot, update):
     logger.info("Getting fingers on %s" % chat_id)
     if chat_id not in open_pineapples.keys():
         logger.info("Pineapple not open")
-        send_message(chat_id, MESSAGE_NOT_YET_OPEN)
+        send_message(bot, chat_id, MESSAGE_NOT_YET_OPEN)
         return
-    send_message(chat_id, get_fingers_list(open_pineapples[chat_id]['adopters']))
+    message = get_fingers_list(open_pineapples[chat_id]['adopters'])
+    send_message(bot, chat_id, message)
 
 
 def ignore_command(bot, update):
@@ -172,9 +172,10 @@ def ignore_command(bot, update):
     logger.info("Getting fingers on %s" % chat_id)
     if chat_id not in open_pineapples.keys():
         logger.info("Pineapple not open")
-        send_message(chat_id, MESSAGE_NOT_YET_OPEN)
+        send_message(bot, chat_id, MESSAGE_NOT_YET_OPEN)
         return
-    ignore(chat_id, update.message.from_user)
+    message = ignore(chat_id, update.message.from_user)
+    send_message(bot, chat_id, message)
 
 
 def close_pineapple_command(bot, update):
@@ -182,15 +183,16 @@ def close_pineapple_command(bot, update):
     logger.info("Close pineapple on %s" % chat_id)
     if chat_id not in open_pineapples.keys():
         logger.info("Pineapple already closed")
-        send_message(chat_id, MESSAGE_NOT_YET_OPEN)
+        send_message(bot, chat_id, MESSAGE_NOT_YET_OPEN)
         return
-    close_pineapple(chat_id)
+    message = close_pineapple(chat_id)
+    send_message(bot, chat_id, message)
 
 
 def main():
     random.seed()
 
-    updater = Updater(bot=bot)
+    updater = Updater(TOKEN)
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler('abacaxi', open_pineapple_command, pass_args=True))
