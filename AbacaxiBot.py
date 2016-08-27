@@ -198,7 +198,7 @@ def main():
     dp.add_handler(CommandHandler('abacaxi', open_pineapple_command, pass_args=True))
     dp.add_handler(CommandHandler('dedo', finger_command))
     dp.add_handler(CommandHandler('dedodequem', who_finger_command))
-    dp.add_handler(CommandHandler('ignorar', ignore_command))
+    dp.add_handler(CommandHandler('naodedo', ignore_command))
     dp.add_handler(CommandHandler('fechar', close_pineapple_command))
 
     updater.start_polling()
