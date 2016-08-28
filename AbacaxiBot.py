@@ -29,7 +29,7 @@ EMOJI_THINKING = "\ud83e\udd14"
 IGNORE_EMOJIS = [EMOJI_UNAMUSED, EMOJI_EXPRESSIONLESS, EMOJI_THINKING]
 
 MESSAGE_ALREADY_OPEN = "Já tem um abacaxi aberto:\n{0}"
-MESSAGE_WHO_IGNORED = "Quem ignorou:"
+MESSAGE_WHO_DOESNT_WANT = "Quem não quer <b>{0}</b>:"
 MESSAGE_WHO_WANTS = EMOJI_CLOSED_HAND + " Quem quer <b>{0}</b>:"
 MESSAGE_FINGER = EMOJI_FINGER
 MESSAGE_NOT_YET_OPEN = "Nenhum abacaxi aberto."
@@ -122,7 +122,7 @@ def close_pineapple(chat_id):
         message += fingers_list
 
     if ignores_list != "":
-        message += "\n" + MESSAGE_WHO_IGNORED
+        message += "\n\n" + MESSAGE_WHO_DOESNT_WANT.format(pineapple['action'])
         message += ignores_list
 
     return message
@@ -156,14 +156,14 @@ def finger_command(bot, update):
     send_message(bot, chat_id, message)
 
 
-def who_finger_command(bot, update):
+def who_command(bot, update):
     chat_id = update.message.chat_id
     logger.info("Getting fingers on %s" % chat_id)
     if chat_id not in open_pineapples.keys():
         logger.info("Pineapple not open")
         send_message(bot, chat_id, MESSAGE_NOT_YET_OPEN)
         return
-    message = get_fingers_list(open_pineapples[chat_id]['adopters'])
+    message = get_full_list(open_pineapples[chat_id]['adopters'])
     send_message(bot, chat_id, message)
 
 
@@ -197,7 +197,7 @@ def main():
 
     dp.add_handler(CommandHandler('abacaxi', open_pineapple_command, pass_args=True))
     dp.add_handler(CommandHandler('dedo', finger_command))
-    dp.add_handler(CommandHandler('dedodequem', who_finger_command))
+    dp.add_handler(CommandHandler('quem', who_command))
     dp.add_handler(CommandHandler('naodedo', ignore_command))
     dp.add_handler(CommandHandler('fechar', close_pineapple_command))
 
