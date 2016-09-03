@@ -5,6 +5,7 @@
 class EMOJI:
     FINGER = "\u261d\ufe0f"
     TWO_FINGERS = "\u270c"
+    MIDDLE_FINGER = "\ud83d\udd95"
     HAND = "\ud83d\udd90"
     BOTH_HANDS = "\ud83d\ude4c"
     CLOSED_HAND = "\ud83d\udc4a"

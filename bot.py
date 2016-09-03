@@ -53,7 +53,7 @@ def open_pineapple_command(bot, update, args):
     send_message(bot, chat_id, message)
 
 
-def finger_in_command(bot, update):
+def finger_in_command(bot, update, args):
     chat_id = update.message.chat_id
     logger.info("Finger on %s" % chat_id)
 
@@ -64,11 +64,16 @@ def finger_in_command(bot, update):
 
     user_name = get_full_name(update.message.from_user)
     pineapple = Pineapple.get(chat_id)
-    try:
-        pineapple.finger_in(user_name)
+
+    if len(args) == 2 and "".join(args) == "domeio":  # Easter Egg
+        pineapple.middle_finger(user_name)
         message = pineapple.get_short_fingers_list_message()
-    except Finger.FingersLimitReached:
-        message = MESSAGE.NO_MORE_FINGERS_IN_HAND
+    else:
+        try:
+            pineapple.finger_in(user_name)
+            message = pineapple.get_short_fingers_list_message()
+        except Finger.FingersLimitReached:
+            message = MESSAGE.NO_MORE_FINGERS_IN_HAND
 
     send_message(bot, chat_id, message)
 
@@ -122,7 +127,7 @@ def main():
     dp = updater.dispatcher
 
     dp.add_handler(CommandHandler('abacaxi', open_pineapple_command, pass_args=True))
-    dp.add_handler(CommandHandler('dedo', finger_in_command))
+    dp.add_handler(CommandHandler('dedo', finger_in_command, pass_args=True))
     dp.add_handler(CommandHandler('quem', who_command))
     dp.add_handler(CommandHandler('dedofora', finger_out_command))
     dp.add_handler(CommandHandler('fechar', close_pineapple_command))

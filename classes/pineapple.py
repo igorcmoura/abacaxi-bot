@@ -30,6 +30,11 @@ class Finger(object):
         self.count = 0
         self.update_emoji()
 
+    def set_middle_finger(self):
+        self.is_in = True
+        self.count = 0
+        self.update_emoji()
+
     def update_emoji(self):
         if self.is_in:
             self.set_emoji_from_finger_count()
@@ -37,7 +42,9 @@ class Finger(object):
             self.set_emoji_from_random_out()
 
     def set_emoji_from_finger_count(self):
-        if self.count < 2:
+        if self.count == 0:
+            self.emoji = EMOJI.MIDDLE_FINGER
+        elif self.count < 2:
             self.emoji = EMOJI.FINGER
         elif self.count < 5:
             self.emoji = EMOJI.TWO_FINGERS
@@ -94,6 +101,12 @@ class Pineapple(object):
         if not self.finger_exists(user_name):
             self.fingers[user_name] = Finger()
         self.fingers[user_name].set_out()
+
+    def middle_finger(self, user_name):
+        logger.info("Finger middle finger from %s" % user_name)
+        if not self.finger_exists(user_name):
+            self.fingers[user_name] = Finger()
+        self.fingers[user_name].set_middle_finger()
 
     # Messages
     def get_open_message(self):
