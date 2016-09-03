@@ -44,12 +44,12 @@ def open_pineapple_command(bot, update, args):
     if Pineapple.is_open(chat_id):
         logger.info("Pineapple already open")
         send_message(bot, chat_id, MESSAGE.ALREADY_OPEN.format(
-            Pineapple.get(chat_id).get_message()))
+            Pineapple.get(chat_id).get_open_message()))
         return
 
     owner_name = get_full_name(update.message.from_user)
     Pineapple.open(chat_id, ' '.join(args), owner_name)
-    message = Pineapple.get(chat_id).get_message()
+    message = Pineapple.get(chat_id).get_open_message()
     send_message(bot, chat_id, message)
 
 
@@ -82,7 +82,7 @@ def who_command(bot, update):
         send_message(bot, chat_id, MESSAGE.NOT_YET_OPEN)
         return
 
-    message = Pineapple.get(chat_id).get_full_fingers_list_message()
+    message = Pineapple.get(chat_id).get_fingers_list_message()
     send_message(bot, chat_id, message)
 
 

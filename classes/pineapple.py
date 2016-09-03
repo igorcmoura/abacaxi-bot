@@ -96,27 +96,32 @@ class Pineapple(object):
         self.fingers[user_name].set_out()
 
     # Messages
-    def get_message(self):
+    def get_open_message(self):
         return MESSAGE.NEW_PINEAPPLE.format(self.action)
 
     def get_close_message(self):
         if self.is_fingers_empty():
             return MESSAGE.NO_ONE
         else:
-            return self.get_full_fingers_list_message(closed_hand=True)
+            return self.get_fingers_list_message(closed=True)
 
-    def get_full_fingers_list_message(self, closed_hand=False):
-        message = MESSAGE.WHO_WANTS.format(self.action) + '\n'
-        if closed_hand:
+    def get_fingers_list_message(self, closed=False):
+
+        if closed:
+            message = MESSAGE.WHO_WANTS_CLOSED + '\n'
             message += EMOJI.CLOSED_HAND
         else:
+            message = MESSAGE.WHO_WANTS_OPEN + '\n'
             message += EMOJI.HAND
         message += ' <b>' + self.owner + '</b>\n'
         message += self.get_fingers_in_list_message() + '\n'
 
         fingers_out = self.get_fingers_out_list_message()
         if fingers_out is not "":
-            message += MESSAGE.WHO_DOESNT_WANT.format(self.action) + '\n'
+            if closed:
+                message += MESSAGE.WHO_DOESNT_WANT_CLOSED + '\n'
+            else:
+                message += MESSAGE.WHO_DOESNT_WANT_OPEN + '\n'
             message += fingers_out
         return message
 

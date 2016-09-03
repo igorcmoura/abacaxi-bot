@@ -18,8 +18,10 @@ class MESSAGE:
     ALREADY_OPEN = "Já tem um abacaxi aberto:\n{0}"
     NOT_YET_OPEN = "Nenhum abacaxi aberto."
 
-    WHO_WANTS = "Quem quer <b>{0}</b>:"
-    WHO_DOESNT_WANT = "Quem não quer <b>{0}</b>:"
+    WHO_WANTS_OPEN = "O abacaxi vai fechar:"
+    WHO_DOESNT_WANT_OPEN = "E quem vai sobrar:"
+    WHO_WANTS_CLOSED = "O abacaxi se fechou:"
+    WHO_DOESNT_WANT_CLOSED = "E quem não entrou:"
 
     FINGER = EMOJI.FINGER
 
