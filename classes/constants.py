@@ -30,3 +30,11 @@ class MESSAGE:
     NO_ONE = "Todos ignoraram o abacaxi. " + EMOJI.SADFACE
     NEW_PINEAPPLE = "Quem quer <b>{0}</b>\npõe o dedo aqui,\nque já vai fechar\no abacaxi. " + EMOJI.PINEAPPLE
     USAGE_OPEN = "Uso:\n/abacaxi <ação>"
+
+    HELP = "O Abacaxi Bot irá te ajudar a fazer uma votação usando a brincadeira do abacaxi. "
+    HELP += "Para isso, use os seguintes comandos:\n"
+    HELP += "/abacaxi <ação> - para abrir um novo abacaxi\n"
+    HELP += "/dedo - para colocar o dedo no abacaxi\n"
+    HELP += "/dedofora - para mostrar que você não quer entrar\n"
+    HELP += "/quem - para ver quem está no abacaxi\n"
+    HELP += "/fechar - para fechar o abacaxi\n"

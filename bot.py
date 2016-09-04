@@ -58,6 +58,11 @@ def text_equals_emoji(text, emoji):
 
 
 # Commands
+def help_command(bot, update):
+    chat_id = update.message.chat_id
+    send_message(bot, chat_id, MESSAGE.HELP, None)
+
+
 def open_pineapple_command(bot, update, args):
     chat_id = update.message.chat_id
     logger.info("Opening pineapple on %s" % chat_id)
@@ -171,6 +176,7 @@ def main():
     updater = Updater(TOKEN)
     dp = updater.dispatcher
 
+    dp.add_handler(CommandHandler('help', help_command))
     dp.add_handler(CommandHandler('abacaxi', open_pineapple_command, pass_args=True))
     dp.add_handler(CommandHandler('dedo', finger_in_command, pass_args=True))
     dp.add_handler(CommandHandler('quem', who_command))
