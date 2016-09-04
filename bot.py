@@ -3,10 +3,12 @@
 #
 # Made by @SparkiL
 
-from telegram.ext import CommandHandler, Updater
+from telegram import KeyboardButton, ReplyKeyboardHide, ReplyKeyboardMarkup
+from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 import logging
+import json
 
-from classes.constants import MESSAGE
+from classes.constants import EMOJI, MESSAGE
 from classes.pineapple import Pineapple, Finger
 
 
@@ -27,8 +29,21 @@ def get_full_name(user):
     return user.first_name + " " + user.last_name
 
 
-def send_message(bot, chat_id, text, parse_mode='HTML'):
-    bot.send_message(chat_id, text, parse_mode=parse_mode)
+def send_message(bot, chat_id, text, parse_mode='HTML', reply_markup=None):
+    bot.send_message(chat_id, text, parse_mode=parse_mode, reply_markup=reply_markup)
+
+
+def create_pineapple_reply_keyboard():
+    button_finger_in = KeyboardButton(EMOJI.FINGER)
+    button_finger_out = KeyboardButton(EMOJI.FINGER_DOWN)
+    keyboard = ReplyKeyboardMarkup([[button_finger_in], [button_finger_out]], one_time_keyboard=True)
+    return keyboard
+
+
+def text_equals_emoji(text, emoji):
+    jtext = json.dumps(text)
+    jemoji = json.dumps(emoji)
+    return  jtext == jemoji
 
 
 # Commands
@@ -50,7 +65,8 @@ def open_pineapple_command(bot, update, args):
     owner_name = get_full_name(update.message.from_user)
     Pineapple.open(chat_id, ' '.join(args), owner_name)
     message = Pineapple.get(chat_id).get_open_message()
-    send_message(bot, chat_id, message)
+    keyboard = create_pineapple_reply_keyboard()
+    send_message(bot, chat_id, message, reply_markup=keyboard)
 
 
 def finger_in_command(bot, update, args):
@@ -119,7 +135,16 @@ def close_pineapple_command(bot, update):
 
     message = Pineapple.get(chat_id).get_close_message()
     Pineapple.close(chat_id)
-    send_message(bot, chat_id, message)
+    send_message(bot, chat_id, message, reply_markup=ReplyKeyboardHide())
+
+
+def message_handler(bot, update):
+    """Check if is a finger in or out"""
+    text = update.message.text
+    if text_equals_emoji(text, EMOJI.FINGER):
+        finger_in_command(bot, update, [])
+    elif text_equals_emoji(text, EMOJI.FINGER_DOWN):
+        finger_out_command(bot, update)
 
 
 def main():
@@ -131,6 +156,7 @@ def main():
     dp.add_handler(CommandHandler('quem', who_command))
     dp.add_handler(CommandHandler('dedofora', finger_out_command))
     dp.add_handler(CommandHandler('fechar', close_pineapple_command))
+    dp.add_handler(MessageHandler([Filters.text], message_handler))
 
     updater.start_polling()
     updater.idle()
