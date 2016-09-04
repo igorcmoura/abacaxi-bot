@@ -33,7 +33,7 @@ def send_message(
         bot,
         chat_id,
         text,
-        parse_mode='HTML',
+        parse_mode='Markdown',
         reply_markup=None,
         reply_to_message_id=None):
     bot.send_message(
@@ -60,7 +60,7 @@ def text_equals_emoji(text, emoji):
 # Commands
 def help_command(bot, update):
     chat_id = update.message.chat_id
-    send_message(bot, chat_id, MESSAGE.HELP, None)
+    send_message(bot, chat_id, MESSAGE.HELP)
 
 
 def open_pineapple_command(bot, update, args):
@@ -69,7 +69,7 @@ def open_pineapple_command(bot, update, args):
 
     if len(args) == 0:
         logger.info("Not enough arguments")
-        send_message(bot, chat_id, MESSAGE.USAGE_OPEN, None)
+        send_message(bot, chat_id, MESSAGE.USAGE_OPEN)
         return
 
     if Pineapple.is_open(chat_id):

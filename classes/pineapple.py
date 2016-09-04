@@ -2,10 +2,17 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import random
 
 from .constants import EMOJI, MESSAGE
 
 logger = logging.getLogger(__name__)
+
+
+def to_bold(text):
+    multiplication_sign = "\u02df"
+    clean_text = text.replace("*", multiplication_sign)
+    return "*" + clean_text + "*"
 
 
 class Finger(object):
@@ -110,7 +117,7 @@ class Pineapple(object):
 
     # Messages
     def get_open_message(self):
-        return MESSAGE.NEW_PINEAPPLE.format(self.action)
+        return MESSAGE.NEW_PINEAPPLE.format(to_bold(self.action))
 
     def get_close_message(self):
         if self.is_fingers_empty():
@@ -126,7 +133,7 @@ class Pineapple(object):
         else:
             message = MESSAGE.WHO_WANTS_OPEN + '\n'
             message += EMOJI.HAND
-        message += ' <b>' + self.owner + '</b>\n'
+        message += ' ' + to_bold(self.owner) + '\n'
         message += self.get_fingers_in_list_message() + '\n'
 
         fingers_out = self.get_fingers_out_list_message()
@@ -139,7 +146,7 @@ class Pineapple(object):
         return message
 
     def get_short_fingers_list_message(self):
-        message = EMOJI.HAND + ' <b>' + self.owner + '</b>\n'
+        message = EMOJI.HAND + " " + to_bold(self.owner) + "\n"
         message += self.get_fingers_in_list_message()
         message += '\n' + self.get_fingers_out_list_message()
         return message

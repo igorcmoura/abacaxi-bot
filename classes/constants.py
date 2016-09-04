@@ -28,7 +28,7 @@ class MESSAGE:
 
     NO_MORE_FINGERS_IN_HAND = "Você não tem mais dedos em suas mãos."
     NO_ONE = "Todos ignoraram o abacaxi. " + EMOJI.SADFACE
-    NEW_PINEAPPLE = "Quem quer <b>{0}</b>\npõe o dedo aqui,\nque já vai fechar\no abacaxi. " + EMOJI.PINEAPPLE
+    NEW_PINEAPPLE = "Quem quer {0}\npõe o dedo aqui,\nque já vai fechar\no abacaxi. " + EMOJI.PINEAPPLE
     USAGE_OPEN = "Uso:\n/abacaxi <ação>"
 
     HELP = "O Abacaxi Bot irá te ajudar a fazer uma votação usando a brincadeira do abacaxi. "
