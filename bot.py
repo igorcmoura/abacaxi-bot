@@ -29,8 +29,19 @@ def get_full_name(user):
     return user.first_name + " " + user.last_name
 
 
-def send_message(bot, chat_id, text, parse_mode='HTML', reply_markup=None):
-    bot.send_message(chat_id, text, parse_mode=parse_mode, reply_markup=reply_markup)
+def send_message(
+        bot,
+        chat_id,
+        text,
+        parse_mode='HTML',
+        reply_markup=None,
+        reply_to_message_id=None):
+    bot.send_message(
+        chat_id,
+        text,
+        parse_mode=parse_mode,
+        reply_to_message_id=reply_to_message_id,
+        reply_markup=reply_markup)
 
 
 def create_pineapple_reply_keyboard():
@@ -69,7 +80,7 @@ def open_pineapple_command(bot, update, args):
     send_message(bot, chat_id, message, reply_markup=keyboard)
 
 
-def finger_in_command(bot, update, args):
+def finger_in_command(bot, update, args, is_reply=False):
     chat_id = update.message.chat_id
     logger.info("Finger on %s" % chat_id)
 
@@ -91,7 +102,11 @@ def finger_in_command(bot, update, args):
         except Finger.FingersLimitReached:
             message = MESSAGE.NO_MORE_FINGERS_IN_HAND
 
-    send_message(bot, chat_id, message)
+    if is_reply:
+        message_id = update.message.message_id
+    else:
+        message_id = None
+    send_message(bot, chat_id, message, reply_to_message_id=message_id, reply_markup=ReplyKeyboardHide(selective=True))
 
 
 def who_command(bot, update):
@@ -107,7 +122,7 @@ def who_command(bot, update):
     send_message(bot, chat_id, message)
 
 
-def finger_out_command(bot, update):
+def finger_out_command(bot, update, is_reply=False):
     chat_id = update.message.chat_id
     logger.info("Getting fingers on %s" % chat_id)
 
@@ -121,7 +136,12 @@ def finger_out_command(bot, update):
     pineapple.finger_out(user_name)
 
     message = pineapple.get_short_fingers_list_message()
-    send_message(bot, chat_id, message)
+
+    if is_reply:
+        message_id = update.message.message_id
+    else:
+        message_id = None
+    send_message(bot, chat_id, message, reply_to_message_id=message_id, reply_markup=ReplyKeyboardHide(selective=True))
 
 
 def close_pineapple_command(bot, update):
@@ -142,9 +162,9 @@ def message_handler(bot, update):
     """Check if is a finger in or out"""
     text = update.message.text
     if text_equals_emoji(text, EMOJI.FINGER):
-        finger_in_command(bot, update, [])
+        finger_in_command(bot, update, [], is_reply=True)
     elif text_equals_emoji(text, EMOJI.FINGER_DOWN):
-        finger_out_command(bot, update)
+        finger_out_command(bot, update, is_reply=True)
 
 
 def main():
