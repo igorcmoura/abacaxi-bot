@@ -96,6 +96,8 @@ class Pineapple(object):
 
     def finger_in(self, user_name):
         logger.info("Finger in from %s" % user_name)
+        if user_name == self.owner:
+            return
         if self.finger_exists(user_name):
             self.fingers[user_name].increment()
         else:
@@ -103,12 +105,16 @@ class Pineapple(object):
 
     def finger_out(self, user_name):
         logger.info("Finger out from %s" % user_name)
+        if user_name == self.owner:
+            return
         if not self.finger_exists(user_name):
             self.fingers[user_name] = Finger()
         self.fingers[user_name].set_out()
 
     def middle_finger(self, user_name):
         logger.info("Finger middle finger from %s" % user_name)
+        if user_name == self.owner:
+            return
         if not self.finger_exists(user_name):
             self.fingers[user_name] = Finger()
         self.fingers[user_name].set_middle_finger()
