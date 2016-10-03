@@ -19,9 +19,8 @@ from classes.logger import logger
 from classes.pineapple import Pineapple, Finger
 
 
-# Get the token from tokens file
-import tokens
-TOKEN = tokens.ABACAXI_TOKEN
+# Get the token from environment variable
+TOKEN = os.environ['TOKEN']
 
 
 # Utils
