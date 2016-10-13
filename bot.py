@@ -165,6 +165,7 @@ def close_pineapple_command(bot, update):
 def message_handler(bot, update):
     """Check if is a finger in or out"""
     text = update.message.text
+    logger.info("Reply on %s: %s" % (str(update.message.chat_id), text.encode('utf-8')))
     if text_equals_emoji(text, EMOJI.FINGER):
         finger_in_command(bot, update, [], is_reply=True)
     elif text_equals_emoji(text, EMOJI.FINGER_DOWN):
