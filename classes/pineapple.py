@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import random
+from diskcache import Cache
 
 from .constants import EMOJI, MESSAGE
 from .logger import logger
@@ -64,7 +64,7 @@ class Finger(object):
 
 class Pineapple(object):
 
-    open_pineapples = {}
+    open_pineapples = Cache('open_pineapples')
 
     @classmethod
     def open(cls, chat_id, action, owner):
@@ -80,8 +80,12 @@ class Pineapple(object):
         return cls.open_pineapples[chat_id]
 
     @classmethod
+    def update(cls, chat_id, pineapple):
+        cls.open_pineapples[chat_id] = pineapple
+
+    @classmethod
     def is_open(cls, chat_id):
-        return chat_id in cls.open_pineapples.keys()
+        return chat_id in cls.open_pineapples
 
     def __init__(self, action, owner):
         self.action = action
@@ -89,7 +93,7 @@ class Pineapple(object):
         self.fingers = {}
 
     def is_fingers_empty(self):
-        return len(self.fingers.keys()) == 0
+        return len(self.fingers) == 0
 
     def finger_exists(self, user_name):
         return user_name in self.fingers.keys()

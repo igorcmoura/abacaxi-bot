@@ -53,7 +53,7 @@ def create_pineapple_reply_keyboard():
 def text_equals_emoji(text, emoji):
     jtext = json.dumps(text)
     jemoji = json.dumps(emoji)
-    return  jtext == jemoji
+    return jtext == jemoji
 
 
 # Commands
@@ -102,6 +102,7 @@ def finger_in_command(bot, update, args, is_reply=False):
     else:
         try:
             pineapple.finger_in(user_name)
+            Pineapple.update(chat_id, pineapple)
             message = pineapple.get_short_fingers_list_message()
         except Finger.FingersLimitReached:
             message = MESSAGE.NO_MORE_FINGERS_IN_HAND
@@ -138,6 +139,7 @@ def finger_out_command(bot, update, is_reply=False):
     user_name = get_full_name(update.message.from_user)
     pineapple = Pineapple.get(chat_id)
     pineapple.finger_out(user_name)
+    Pineapple.update(chat_id, pineapple)
 
     message = pineapple.get_short_fingers_list_message()
 
