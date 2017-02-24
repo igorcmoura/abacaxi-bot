@@ -8,15 +8,15 @@ from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 import json
 import os
 
-from classes.constants import EMOJI, MESSAGE
-from classes.logger import logger
-from classes.pineapple import Pineapple, Finger
-
 
 # Change the working directory to the file's directory
 abspath = os.path.abspath(__file__)
 dir_name = os.path.dirname(abspath)
 os.chdir(dir_name)
+
+from classes.constants import EMOJI, MESSAGE
+from classes.logger import logger
+from classes.pineapple import Pineapple, Finger
 
 
 # Get the token from tokens file
