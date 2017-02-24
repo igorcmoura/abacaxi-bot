@@ -5,23 +5,23 @@
 
 from telegram import KeyboardButton, ReplyKeyboardHide, ReplyKeyboardMarkup
 from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
-import logging
 import json
+import os
 
 from classes.constants import EMOJI, MESSAGE
+from classes.logger import logger
 from classes.pineapple import Pineapple, Finger
+
+
+# Change the working directory to the file's directory
+abspath = os.path.abspath(__file__)
+dir_name = os.path.dirname(abspath)
+os.chdir(dir_name)
 
 
 # Get the token from tokens file
 import tokens
 TOKEN = tokens.ABACAXI_TOKEN
-
-
-# Logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 # Utils

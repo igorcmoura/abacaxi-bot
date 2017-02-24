@@ -5,8 +5,7 @@ import logging
 import random
 
 from .constants import EMOJI, MESSAGE
-
-logger = logging.getLogger(__name__)
+from .logger import logger
 
 
 def to_bold(text):
